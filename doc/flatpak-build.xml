@@ -385,6 +385,15 @@ key=v1;v2;
                 </para></listitem>
             </varlistentry>
 
+          <varlistentry>
+              <term><option>--arch=ARCH</option></term>
+
+              <listitem><para>
+                  Use this architecture instead of the one that is specified in the metadata.
+                  This allows running commands with a different architecture of the sdk.
+              </para></listitem>
+          </varlistentry>
+
           </variablelist>
     </refsect1>
 

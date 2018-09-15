@@ -35,6 +35,7 @@
 #include "flatpak-run-private.h"
 
 static gboolean opt_runtime;
+static char *opt_arch;
 static char *opt_build_dir;
 static char **opt_bind_mounts;
 static char *opt_sdk_dir;
@@ -46,6 +47,7 @@ static gboolean opt_with_appdir;
 static gboolean opt_readonly;
 
 static GOptionEntry options[] = {
+  { "arch", 0, 0, G_OPTION_ARG_STRING, &opt_arch, N_("Use alternative arch"), N_("ARCH") },
   { "runtime", 'r', 0, G_OPTION_ARG_NONE, &opt_runtime, N_("Use Platform runtime rather than Sdk"), NULL },
   { "readonly", 0, 0, G_OPTION_ARG_NONE, &opt_readonly, N_("Make destination readonly"), NULL },
   { "bind-mount", 0, 0, G_OPTION_ARG_STRING_ARRAY, &opt_bind_mounts, N_("Add bind mount"), N_("DEST=SRC") },
@@ -290,6 +292,14 @@ flatpak_builtin_build (int argc, char **argv, GCancellable *cancellable, GError 
   runtime_ref_parts = flatpak_decompose_ref (runtime_ref, error);
   if (runtime_ref_parts == NULL)
     return FALSE;
+
+  if (opt_arch != NULL && strcmp (runtime_ref_parts[2], opt_arch) != 0)
+    {
+      g_free (runtime_ref);
+      g_free (runtime_ref_parts[2]);
+      runtime_ref_parts[2] = g_strdup (opt_arch);
+      runtime_ref = flatpak_build_runtime_ref (runtime_ref_parts[1], runtime_ref_parts[3], opt_arch);
+    }
 
   custom_usr = FALSE;
   usr = g_file_get_child (res_deploy,  opt_sdk_dir ? opt_sdk_dir : "usr");
